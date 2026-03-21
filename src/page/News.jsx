@@ -11,6 +11,7 @@ const News = ({ className }) => {
       const data = await fetchNews();
       setNews(data?.articles || []);
     })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
@@ -56,7 +57,7 @@ const NewsCard = ({ details }) => {
         <div className="card-actions justify-end mt-4">
           <button
             onClick={() => window.open(details.url)}
-            className="btn btn-outline"
+            className="btn bg-purple-700 hover:bg-purple-600 border-none text-white shadow-md active:scale-95 transition-all"
           >
             Read More
           </button>

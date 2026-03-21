@@ -1,53 +1,74 @@
 import React, { useState } from "react";
-import Wrapper from "./Wrapper";
 import { useNewsContext } from "../context/NewsContext";
 
-const Navbar = ({ className }) => {
+const Navbar = () => {
   const [searchValue, setSearchValue] = useState("");
+  const [loading, setLoading] = useState(false);
+
   const { setNews, fetchNews } = useNewsContext();
 
   const searchNews = async () => {
-    if (!searchValue) return;
+    if (!searchValue.trim()) return;
 
     try {
+      setLoading(true);
       const data = await fetchNews(`/everything?q=${searchValue}`);
-      setNews(data.articles);
+      setNews(data?.articles || []);
     } catch (error) {
-      console.log(error);
+      console.error(error);
+      setNews([]);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className={`bg-gradient-to-r from-blue-500 to-purple-600 text-white ${className}`}>
-      <Wrapper>
-        <div className="navbar shadow-sm">
+    <div className="sticky top-0 z-50 bg-gradient-to-r from-purple-900 via-purple-700 to-purple-600 text-white shadow-xl">
+      
+      <div className="px-6 md:px-16 py-3 flex justify-between items-center">
+        
+        {/* Logo */}
+        <h1 className="text-lg md:text-2xl font-extrabold tracking-wide">
+          NewsPulse
+        </h1>
 
-          <div className="flex-1">
-            <a className="btn btn-ghost text-xl text-white">News App</a>
-          </div>
+        {/* Search */}
+        <div className="flex items-center gap-2">
+          
+          <input
+            value={searchValue}
+            onChange={(e) => setSearchValue(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && searchNews()}
+            placeholder="Search..."
+            className="
+              px-3 py-1 rounded-full 
+              bg-white/10 backdrop-blur-md
+              border border-white/20
+              text-white placeholder-white/70
+              focus:bg-white focus:text-gray-800
+              focus:placeholder-gray-400
+              focus:ring-2 focus:ring-purple-300
+              outline-none transition-all 
+              w-28 sm:w-40 md:w-52
+              text-sm
+            "
+          />
 
-          <div className="flex gap-2">
-            <input
-              onChange={(e) => setSearchValue(e.target.value)}
-              value={searchValue}
-              type="text"
-              placeholder="Search"
-              className="input input-bordered text-black w-24 md:w-auto"
-              onKeyDown={(e) => {
-                if (e.key === "Enter") searchNews();
-              }}
-            />
-
-            <button
-              onClick={searchNews}
-              className="btn bg-white text-blue-600 border-none"
-            >
-              Search
-            </button>
-          </div>
+          <button
+            onClick={searchNews}
+            className="
+              px-3 py-1 rounded-full
+              bg-white text-purple-700 text-sm font-semibold
+              hover:bg-purple-100
+              active:scale-95
+              transition-all shadow-md
+            "
+          >
+            {loading ? "..." : "Search"}
+          </button>
 
         </div>
-      </Wrapper>
+      </div>
     </div>
   );
 };
